@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-//import SwiftData
+import SwiftData
 
 struct ContentView: View {
     
     @Environment(\.modelContext) var context
-    @State private var items:[Item] = []
+    @Query private var items:[Item] = []
     @State private var newItem = ""
     
     var body: some View {
@@ -22,8 +22,11 @@ struct ContentView: View {
                     .padding()
                 Spacer()
                 if !items.isEmpty {
-                    List(items){ item in
-                        Text(item.name)
+                    List {
+                        ForEach(items) { item in
+                            Text(item.name)
+                        }
+                        .onDelete(perform: deleteItem(at:))
                     }
                 } else {
                     Text("Empty")
@@ -35,10 +38,15 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("追加"){
                         let newItem = Item(name: newItem)
-                        items.append(newItem)
                         context.insert(newItem)
                         try? context.save()
                         self.newItem = ""
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("削除"){
+                        print("#")
+                        
                     }
                 }
             }
@@ -47,6 +55,14 @@ struct ContentView: View {
             }
         }
     }
+    
+    private func deleteItem(at offsets: IndexSet) {
+        for index in offsets {
+            let selectedItem = items[index]
+            context.delete(selectedItem)
+        }
+    }
+    
 }
 
 #Preview {
