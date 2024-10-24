@@ -43,13 +43,8 @@ struct ContentView: View {
                         self.newItem = ""
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("削除"){
-                        print("#")
-                        
-                    }
-                }
             }
+            //追加ボタンがタップされたタイミングでTextFieldの中身を空にする
             .onChange(of: newItem) { oldValue, _ in
                 newItem = oldValue
             }
@@ -62,9 +57,9 @@ struct ContentView: View {
             context.delete(selectedItem)
         }
     }
-    
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: [Item.self])
 }
