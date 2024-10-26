@@ -1,6 +1,10 @@
 import UIKit
 import SwiftData
 
+
+
+
+
 //イオン
 
 //お店
@@ -22,10 +26,10 @@ struct Good {
 
 var AEON: [Shop] = []
 
-let mcdonalds: Shop =  Shop(name: "マクド",
-                            goods: [Good(name: "月見", price: 250),
-                                    Good(name: "ハンバーガー", price: 100),
-                                    Good(name: "ポテト", price: 150)
+let mcdonalds: Shop =  Shop(name: "ムラサキスポーツ",
+                            goods: [Good(name: "ラケット", price: 3000),
+                                    Good(name: "グローブ", price: 4000),
+                                    Good(name: "スパイク", price: 5000)
                                    ]
                         )
 
@@ -45,7 +49,7 @@ AEON.append(threeCoins)
 AEON[1]
 //aeon.count
 
-let nano: Shop = Shop(name: "nano",
+let nano: Shop = Shop(name: "nano universe",
                       goods: [Good(name: "服", price: 6000),
                               Good(name: "パンツ", price: 5000),
                               Good(name: "スーツ", price: 15000),
@@ -58,28 +62,26 @@ AEON[2]
 AEON.count
 
 
-let フライドポテト = AEON[0].goods[2]
 
-let コップ = AEON[1].goods[0]
-
-
+//買ったもの
+var bougthItem:[Good] = []
 
 
-// お店が完成。
+//買いたいものを選んで、買ってく
+let NIKEのスパイク = AEON[0].goods[2]
+let ３Coindsのコップ = AEON[1].goods[0]
+let nanoのパンツ = AEON[2].goods[1]
+bougthItem.append(NIKEのスパイク)
+bougthItem.append(３Coindsのコップ)
+bougthItem.append(nanoのパンツ)
 
-
-
-
-
-
-// お客さん目線
-
-
-//どれがほしいのか選ぶ
+//買ったものを確認する。
+print(bougthItem)
 
 
 
 
-//選んだものを３つ選びだす
+
+
 
 
