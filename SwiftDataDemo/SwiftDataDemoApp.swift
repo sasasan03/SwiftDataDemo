@@ -16,6 +16,7 @@ struct SwiftDataDemoApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Item.self)
+        .modelContainer(for: [Shop.self])
+//        .modelContainer(for: [Item.self])// TODO: ここで合ってるか？
     }
 }
