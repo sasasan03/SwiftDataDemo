@@ -11,7 +11,8 @@ import SwiftData
 struct SimpleData: View {
     
     @Environment(\.modelContext) var context
-    @Query private var items:[Item] = []
+    @Query private var saveItems:[Item] = []
+    @State private var items:[Item] = []
     @State private var newItem = ""
     
     var body: some View {
@@ -39,6 +40,7 @@ struct SimpleData: View {
                     Button("追加"){
                         let newItem = Item(name: newItem)
                         context.insert(newItem)
+                        items.append(newItem)
                         try? context.save()
                         self.newItem = ""
                     }
@@ -53,9 +55,10 @@ struct SimpleData: View {
     
     private func deleteItem(at offsets: IndexSet) {
         for index in offsets {
-            let selectedItem = items[index]
+            let selectedItem = saveItems[index]
             context.delete(selectedItem)
         }
+        try? context.save() // 削除を保存
     }
 }
 

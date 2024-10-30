@@ -3,7 +3,38 @@
 //  SwiftDataDemo
 //
 //  Created by sako0602 on 2024/10/25.
-//
+
+
+
+//                    Button("追加") {
+//                        // TODO: 配列にGoodをする処理を書く
+//                        let newShop = saveShop(image: selectedImage)
+//                        context.insert(newShop)
+//                        try? context.save()
+//                        self.shopName = ""
+//                    }
+//}追加ボタン
+
+
+//    private func saveShop(image: UIImage?) -> Shop {
+//        guard let image, let imageData = image.jpegData(compressionQuality: 0.8) else { return Shop(name: "失敗", imageData: nil, goods: []) }
+//        return Shop(
+//            name: shopName,
+//            imageData: imageData,
+//            goods: []
+//        )
+//    }
+
+
+////追加ボタンがタップされたタイミングでTextFieldの中身を空にする
+//.onChange(of: shopName) { oldValue, _ in
+//    shopName = oldValue
+//}
+
+
+
+
+
 
 import SwiftUI
 import SwiftData
@@ -11,90 +42,124 @@ import SwiftData
 struct ShopView: View {
     
     @Environment(\.modelContext) var context
-    @Query private var shopList:[Shop] = []
+    @Query private var savedShopList:[Shop] = []
     @State private var path: [Shop] = []
-    @State private var newShop = ""
+    @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ
+    @State private var showAddShopView = false
+
     
     var body: some View {
         NavigationStack(path: $path) {
-            VStack {
-                TextField("お店を入力してください", text: $newShop)
-                    .textFieldStyle(.roundedBorder)
-                    .padding()
-                Spacer()
-                List(shopList){ shop in
-                    // 次のViewに対して渡すvalue
+            //OnDeleteを使用するためにListで包む。
+            List {
+                AddShopRowView()
+                    .onTapGesture {
+                        showAddShopView = true
+                    }
+                ForEach(shopList){ shop in
                     NavigationLink(value: shop) {
-                        Text(shop.name)
+                        ShopRowView(shop: shop)
                     }
                 }
+                .onDelete(perform: deleteItem)
             }
-            .navigationTitle("AEON(イオン)")
+            .listStyle(.grouped)
+            .navigationTitle("お店一覧")
             .navigationDestination(for:  Shop.self, destination: { shop in
-                RowView(shop: .constant(shop))
+                // .constantで包むことでBindingを要求してくるViewに対応できる。
+                GoodsView(shop: .constant(shop))
             })
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("追加"){
-                        let newShop = Shop(name: newShop, goods: [])
-                        context.insert(newShop)
-                        try? context.save()
-                        self.newShop = ""
-                    }
+            
+        }
+        .onAppear {
+            //アプリ立ち上げ時に保存したデータを、編集するためのプロパティへ代入
+            shopList = savedShopList
+        }
+        .sheet(isPresented: $showAddShopView) {
+            AddShopSheetView() { shopName, shopImage in
+                let shop = Shop(name: shopName, imageData: shopImage, goods: [])
+                context.insert(shop)
+                shopList.append(shop)
+                do {
+                    try context.save()
+                    showAddShopView = false
+                } catch {
+                    print("addShopSheet closure error.")
                 }
-            }
-            //追加ボタンがタップされたタイミングでTextFieldの中身を空にする
-            .onChange(of: newShop) { oldValue, _ in
-                newShop = oldValue
             }
         }
     }
+    
+    private func deleteItem(at offsets: IndexSet) {
+        for index in offsets {
+            let selectedItem = savedShopList[index]
+            context.delete(selectedItem)
+            shopList.remove(atOffsets: offsets)
+        }
+        try? context.save()
+    }
+    
 }
 
-struct RowView: View {
-    
-    @Binding var shop: Shop
-    
+struct ShopRowView: View {
+    let shop: Shop?
     var body: some View {
-        Group {
-            if shop.goods.isEmpty {
-                Text("グッズを追加してください。")
+        HStack{
+            //画像
+            if let imageData = shop?.imageData {
+                Image(uiImage: UIImage(data: imageData)!)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
             } else {
-                List(shop.goods) { good in
-                    Text("グッズは『\(good.name)』です")
-                }
+                Image(systemName: "photo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
             }
+            //お店の名前
+            VStack {
+                Spacer()//🍔中央寄せ
+                HStack {
+                    if let shopName = shop?.name {
+                        Text(shopName)
+                    } else {
+                        Text("ショップ名なし（エラー）")
+                    }
+                    Spacer()//名前を左に寄せる
+                }//下線
+                Spacer()//🍔中央寄せ
+            }
+            Spacer()
         }
-        .navigationTitle(shop.name)
     }
 }
 
-//お店
-@Model
-class Shop: Identifiable {
-    var id = UUID()
-    var name: String
-    var goods: [Good]
-    
-    init(name: String, goods: [Good]) {
-        self.name = name
-        self.goods = goods
+struct AddShopRowView: View {
+    var body: some View {
+        HStack{
+            Image(systemName: "plus.square.dashed")
+                .resizable()
+                .scaledToFit()
+                .foregroundStyle(.red,.orange)
+                .frame(width: 50, height: 50)
+            VStack {
+                Spacer()//🍔中央寄せ
+                HStack {
+                    Button {
+                        
+                    } label: {
+                        Text("ショップを追加する...")
+                            .foregroundStyle(.red)
+                    }
+                    Spacer()//名前を左に寄せる
+                }//下線
+                Spacer()//🍔中央寄せ
+            }
+            Spacer()
+        }
     }
 }
-
-//お店にある商品
-@Model
-class Good: Identifiable {
-    var id = UUID()
-    var name: String
-    var price: Int
-    init(name: String, price: Int) {
-        self.name = name
-        self.price = price
-    }
-}
-
-
 
 #Preview {
     ShopView()
