@@ -5,6 +5,17 @@
 //  Created by sako0602 on 2024/10/27.
 //
 
+
+//.sheet(isPresented: $isPickerPresented) {
+//    PhotoPicker(selectedImage: $selectedImage)
+//}
+
+
+
+
+
+
+
 import SwiftUI
 import SwiftData
 
@@ -22,10 +33,6 @@ struct GoodsView: View {
     
     var body: some View {
         VStack {
-            Text("『\(shop.name)』に商品を追加する")
-            if shop.goods.isEmpty {
-                Text("グッズを追加してください。")
-            } else {
                 List {
                     ForEach(shop.goods) { good in
                         HStack {
@@ -34,9 +41,7 @@ struct GoodsView: View {
                     }
                 }
                 .sheet(item: $selectedGood) { good in
-                    SheetView(good: good)
                 }
-            }
             Spacer()
         }
         .navigationTitle("グッズ編集画面")
@@ -59,12 +64,6 @@ struct GoodsView: View {
                 }
             }
         }
-        .sheet(isPresented: $showAddGoodsModal) {
-            SheetView(good: Good(name: "魚", price: 150))
-        }
-        .sheet(isPresented: $isPickerPresented) {
-            PhotoPicker(selectedImage: $selectedImage)
-        }
     }
     
     //追加と同時にデータの保存を行う
@@ -79,26 +78,13 @@ struct GoodsView: View {
             goods: []
         )
     }
-
-    
 }
 
-struct SheetView: View {
-    
-    let good: Good
-    @State private var goodName = ""
-//    @Binding var good
-    
+struct GoodEditView: View {
     var body: some View {
-        HStack{
-            TextField("商品を入力してください", text: $goodName)
-            Button("保存"){
-                
-            }
-        }
+        Text("編集")
     }
 }
-
 
 #Preview {
     GoodsView(shop: .constant(Shop(name: "ナイキ", imageData: nil, goods: [])))

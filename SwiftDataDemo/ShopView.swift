@@ -36,6 +36,7 @@
 
 
 
+
 import SwiftUI
 import SwiftData
 
@@ -46,16 +47,22 @@ struct ShopView: View {
     @State private var path: [Shop] = []
     @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ
     @State private var showAddShopView = false
+    @State private var isError = false
 
     
     var body: some View {
         NavigationStack(path: $path) {
             //OnDeleteを使用するためにListで包む。
             List {
+                Button("エラー"){
+                    isError = true
+                }
+                // 上部の一つだけ変わったセル
                 AddShopRowView()
                     .onTapGesture {
                         showAddShopView = true
                     }
+                // 上部一つ他全て
                 ForEach(shopList){ shop in
                     NavigationLink(value: shop) {
                         ShopRowView(shop: shop)
@@ -63,7 +70,7 @@ struct ShopView: View {
                 }
                 .onDelete(perform: deleteItem)
             }
-            .listStyle(.grouped)
+            .listStyle(.grouped) //変わった感じのListでおもろそうだったので使ってみた。
             .navigationTitle("お店一覧")
             .navigationDestination(for:  Shop.self, destination: { shop in
                 // .constantで包むことでBindingを要求してくるViewに対応できる。
@@ -72,22 +79,31 @@ struct ShopView: View {
             
         }
         .onAppear {
-            //アプリ立ち上げ時に保存したデータを、編集するためのプロパティへ代入
+            //アプリ立ち上げ時に、保存したデータを編集するためのプロパティへ代入
             shopList = savedShopList
         }
         .sheet(isPresented: $showAddShopView) {
+            // 新しく作成するお店（名前とデータ）をもらってきて保存する。
             AddShopSheetView() { shopName, shopImage in
                 let shop = Shop(name: shopName, imageData: shopImage, goods: [])
-                context.insert(shop)
-                shopList.append(shop)
+                context.insert(shop) //SwiftDataへ追加
+                shopList.append(shop) //編集のためのListへ追加
                 do {
                     try context.save()
-                    showAddShopView = false
+                    // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
+                    path.append(shop)
                 } catch {
-                    print("addShopSheet closure error.")
+                    isError = true
+                    print("Error saving shop: \(error)")
                 }
             }
         }
+        .alert(isPresented: $isError, error: ShopError.saveDataError) {
+            Button("OK"){
+                isError = false
+            }
+        }
+
     }
     
     private func deleteItem(at offsets: IndexSet) {
@@ -101,6 +117,7 @@ struct ShopView: View {
     
 }
 
+// 追加されたお店の雛形
 struct ShopRowView: View {
     let shop: Shop?
     var body: some View {
@@ -135,6 +152,7 @@ struct ShopRowView: View {
     }
 }
 
+// List上部にあるショップモーダルを表示させるためのボタン
 struct AddShopRowView: View {
     var body: some View {
         HStack{
