@@ -10,7 +10,7 @@ import SwiftData
 
 struct GoodsView: View {
     
-    @Binding var shop: Shop
+    @Bindable var shop: Shop
     @State private var showAddModal = false
     @State private var selectedGood: Good?
     @State private var goodName = ""

@@ -44,9 +44,8 @@ struct ShopView: View {
             .listStyle(.grouped) //変わった感じのListでおもろそうだったので使ってみた。
             .navigationTitle("お店一覧")
             .navigationDestination(for:  Shop.self, destination: { shop in
-                GoodsView(shop: .constant(shop))
+                GoodsView(shop: shop)
             })
-            
         }
         .onAppear {
             //アプリ立ち上げ時に、保存したデータを編集するためのプロパティへ代入
@@ -56,10 +55,9 @@ struct ShopView: View {
             // 新しく作成するお店（名前とデータ）をもらってきて保存する。
             AddShopSheetView() { shopName, shopImage in
                 let shop = Shop(name: shopName, imageData: shopImage, goods: [])
-                context.insert(shop) //SwiftDataへ追加
+                context.insert(shop) //saveできるよう、保存可能状態に持ってく
                 shopList.append(shop) //編集のためのListへ追加
                 do {
-                    try context.save()
                     // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
                     path.append(shop)
                 } catch {
@@ -72,7 +70,6 @@ struct ShopView: View {
                 isError = false
             }
         }
-
     }
     
     private func deleteItem(at offsets: IndexSet) {
@@ -81,7 +78,11 @@ struct ShopView: View {
             context.delete(selectedItem)
             shopList.remove(atOffsets: offsets)
         }
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            isError = true
+        }
     }
     
 }
