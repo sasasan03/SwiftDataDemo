@@ -4,38 +4,10 @@
 //
 //  Created by sako0602 on 2024/10/25.
 
-
-
-//                    Button("追加") {
-//                        // TODO: 配列にGoodをする処理を書く
-//                        let newShop = saveShop(image: selectedImage)
-//                        context.insert(newShop)
-//                        try? context.save()
-//                        self.shopName = ""
-//                    }
-//}追加ボタン
-
-
-//    private func saveShop(image: UIImage?) -> Shop {
-//        guard let image, let imageData = image.jpegData(compressionQuality: 0.8) else { return Shop(name: "失敗", imageData: nil, goods: []) }
-//        return Shop(
-//            name: shopName,
-//            imageData: imageData,
-//            goods: []
-//        )
-//    }
-
-
 ////追加ボタンがタップされたタイミングでTextFieldの中身を空にする
 //.onChange(of: shopName) { oldValue, _ in
 //    shopName = oldValue
 //}
-
-
-
-
-
-
 
 import SwiftUI
 import SwiftData
@@ -52,17 +24,16 @@ struct ShopView: View {
     
     var body: some View {
         NavigationStack(path: $path) {
-            //OnDeleteを使用するためにListで包む。
+            //OnDeleteを使用するためにList使てる
             List {
-                Button("エラー"){
-                    isError = true
-                }
                 // 上部の一つだけ変わったセル
                 AddShopRowView()
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
                     .onTapGesture {
                         showAddShopView = true
                     }
-                // 上部一つ他全て
+                // 上部一つ以外
                 ForEach(shopList){ shop in
                     NavigationLink(value: shop) {
                         ShopRowView(shop: shop)
@@ -73,7 +44,6 @@ struct ShopView: View {
             .listStyle(.grouped) //変わった感じのListでおもろそうだったので使ってみた。
             .navigationTitle("お店一覧")
             .navigationDestination(for:  Shop.self, destination: { shop in
-                // .constantで包むことでBindingを要求してくるViewに対応できる。
                 GoodsView(shop: .constant(shop))
             })
             
@@ -94,7 +64,6 @@ struct ShopView: View {
                     path.append(shop)
                 } catch {
                     isError = true
-                    print("Error saving shop: \(error)")
                 }
             }
         }
@@ -118,7 +87,7 @@ struct ShopView: View {
 }
 
 // 追加されたお店の雛形
-struct ShopRowView: View {
+private struct ShopRowView: View {
     let shop: Shop?
     var body: some View {
         HStack{
@@ -153,7 +122,7 @@ struct ShopRowView: View {
 }
 
 // List上部にあるショップモーダルを表示させるためのボタン
-struct AddShopRowView: View {
+private struct AddShopRowView: View {
     var body: some View {
         HStack{
             Image(systemName: "plus.square.dashed")

@@ -9,11 +9,14 @@ import Foundation
 
 enum ShopError: LocalizedError {
     case saveDataError
+    case matchingGoodError
     
     var errorDescription: String? {
         switch self {
         case .saveDataError:
             return "データの保存に失敗しました。"
+        case .matchingGoodError:
+            return "書き換えるグッズが見つけられませんでした。"
         }
     }
 }

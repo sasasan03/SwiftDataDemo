@@ -29,8 +29,10 @@ class Good: Identifiable {
     var id = UUID()
     var name: String
     var price: Int
-    init(name: String, price: Int) {
+    var imageData: Data?
+    init(name: String, price: Int, imageData: Data?) {
         self.name = name
         self.price = price
+        self.imageData = imageData
     }
 }
