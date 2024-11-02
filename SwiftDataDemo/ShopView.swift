@@ -4,11 +4,6 @@
 //
 //  Created by sako0602 on 2024/10/25.
 
-////追加ボタンがタップされたタイミングでTextFieldの中身を空にする
-//.onChange(of: shopName) { oldValue, _ in
-//    shopName = oldValue
-//}
-
 import SwiftUI
 import SwiftData
 
@@ -20,7 +15,6 @@ struct ShopView: View {
     @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ
     @State private var showAddShopView = false
     @State private var isError = false
-
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -65,8 +59,8 @@ struct ShopView: View {
     
     private func deleteShop(at offsets: IndexSet) {
         for index in offsets {
-            let selectedItem = savedShopList[index]
-            context.delete(selectedItem)
+            let selectedShop = savedShopList[index]
+            context.delete(selectedShop)
             shopList.remove(atOffsets: offsets)
         }
     }

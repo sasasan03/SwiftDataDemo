@@ -32,9 +32,10 @@ struct GoodsView: View {
                         selectedGood = good
                     }
             }
+            .onDelete(perform: deleteGood)
         }
         .listStyle(.grouped)
-        .sheet(item: $selectedGood) { selectedGood in //タップされたグッズの編集のシート
+        .sheet(item: $selectedGood) { selectedGood in //タップされたグッズの編集のシートを開く
             GoodSheetView(good: selectedGood) { saveGood in
                 if let index = shop.goods.firstIndex(where: { $0 == selectedGood }) {
                     shop.goods[index] = saveGood
@@ -43,7 +44,7 @@ struct GoodsView: View {
                 }
             }
         }
-        .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシート
+        .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシートを開く
             GoodSheetView(good: nil) { good in
                 shop.goods.append(good)
             }
@@ -54,6 +55,10 @@ struct GoodsView: View {
                 isError = false
             }
         }
+    }
+    
+    private func deleteGood(at offsets: IndexSet) {
+        shop.goods.remove(atOffsets: offsets)
     }
     
 }
@@ -97,9 +102,6 @@ private struct GoodRowView: View {
 }
 
 
-
-
-
 // List上部にあるショップモーダルを表示させるためのボタン
 private struct AddGoodRowView: View {
     var body: some View {
@@ -112,12 +114,8 @@ private struct AddGoodRowView: View {
             VStack {
                 Spacer()//🍔中央寄せ
                 HStack {
-                    Button {
-                        
-                    } label: {
-                        Text("グッズを追加する...")
-                            .foregroundStyle(.red)
-                    }
+                    Text("グッズを追加する...")
+                        .foregroundStyle(.red)
                     Spacer()//名前を左に寄せる
                 }//下線
                 Spacer()//🍔中央寄せ
