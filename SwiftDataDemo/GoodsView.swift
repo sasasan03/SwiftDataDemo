@@ -20,7 +20,7 @@ struct GoodsView: View {
         List {
             AddGoodRowView()
                 .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())//ヒットテストをframeの箇所まで伸ばす。
+                .contentShape(Rectangle())
                 .onTapGesture {
                     showAddModal = true
                 }
@@ -35,7 +35,7 @@ struct GoodsView: View {
         }
         .listStyle(.grouped)
         .sheet(item: $selectedGood) { selectedGood in //タップされたグッズの編集のシート
-            AddOrEditGoodsSheetView(good: selectedGood) { saveGood in
+            GoodSheetView(good: selectedGood) { saveGood in
                 if let index = shop.goods.firstIndex(where: { $0 == selectedGood }) {
                     shop.goods[index] = saveGood
                 } else {
@@ -44,7 +44,7 @@ struct GoodsView: View {
             }
         }
         .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシート
-            AddOrEditGoodsSheetView(good: nil) { good in
+            GoodSheetView(good: nil) { good in
                 shop.goods.append(good)
             }
         }
@@ -98,82 +98,6 @@ private struct GoodRowView: View {
 
 
 
-
-private struct AddOrEditGoodsSheetView: View {
-    
-    @Environment(\.dismiss) private var dismiss
-    @State private var goodName = ""
-    @State private var goodPrice = ""
-    @State private var selectedImage: UIImage?
-    @State private var isPickerPresented = false
-    let good: Good?
-    let saveGood: (Good) -> Void
-    
-    init(good: Good?, saveGood:  @escaping (Good) -> Void ){
-        if let good {
-            //　🟥写真は追加するかどうかは後ほど
-            goodName = good.name
-            goodPrice = String(good.price)
-        }
-        self.good = good
-        self.saveGood = saveGood
-    }
-    
-    var body: some View {
-        NavigationStack {
-            VStack {
-                if let good { //グッズ編集画面(すでに画像、名前、金額を持っている)
-                    if let imageData = good.imageData {
-                        let uiImage = UIImage(data: imageData)!
-                        Image(uiImage:  uiImage)
-                    } else {
-                        Image(systemName: "photo")
-                    }
-                    TextField(good.name, text: $goodName)
-                        .textFieldStyle(.roundedBorder)
-                        .padding()
-                    TextField(String(good.price), text: $goodPrice)
-                        .textFieldStyle(.roundedBorder)
-                        .padding()
-                } else { //新しいグッズを追加する
-                    Image(systemName: "photo")
-                    TextField("グッズを入力してください。", text: $goodName)
-                        .textFieldStyle(.roundedBorder)
-                        .padding()
-                    TextField("金額を入力してください。", text: $goodPrice)
-                        .textFieldStyle(.roundedBorder)
-                        .padding()
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("キャンセル")
-                            .foregroundStyle(.red)
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    // TODO: エラー処理
-                    Button { //入力したデータを前のViewへ渡して保存してもらう
-                        let selectImage = selectedImage?.jpegData(compressionQuality: 1.0)
-                        let goodPrice = Int(goodPrice) ?? 0
-                        let good = Good(name: goodName, price: goodPrice, imageData: selectImage)
-                        saveGood(good)
-                        dismiss()
-                    } label: {
-                        Text("保存")
-                    }
-                    
-                }
-            }
-            .sheet(isPresented: $isPickerPresented) {
-                PhotoPicker(selectedImage: $selectedImage)
-            }
-        }
-    }
-}
 
 
 // List上部にあるショップモーダルを表示させるためのボタン

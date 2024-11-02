@@ -15,7 +15,7 @@ import SwiftData
 struct ShopView: View {
     
     @Environment(\.modelContext) var context
-    @Query private var savedShopList:[Shop] = []
+    @Query private var savedShopList:[Shop] = []//get_onlyのプロパティ
     @State private var path: [Shop] = []
     @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ
     @State private var showAddShopView = false
@@ -29,7 +29,7 @@ struct ShopView: View {
                 // 上部の一つだけ変わったセル
                 AddShopRowView()
                     .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
+                    .contentShape(Rectangle())//ヒットテストをframeの箇所まで伸ばす。
                     .onTapGesture {
                         showAddShopView = true
                     }
@@ -39,7 +39,7 @@ struct ShopView: View {
                         ShopRowView(shop: shop)
                     }
                 }
-                .onDelete(perform: deleteItem)
+                .onDelete(perform: deleteShop)
             }
             .listStyle(.grouped) //変わった感じのListでおもろそうだったので使ってみた。
             .navigationTitle("お店一覧")
@@ -53,35 +53,21 @@ struct ShopView: View {
         }
         .sheet(isPresented: $showAddShopView) {
             // 新しく作成するお店（名前とデータ）をもらってきて保存する。
-            AddShopSheetView() { shopName, shopImage in
+            ShopSheetView() { shopName, shopImage in
                 let shop = Shop(name: shopName, imageData: shopImage, goods: [])
-                context.insert(shop) //saveできるよう、保存可能状態に持ってく
-                shopList.append(shop) //編集のためのListへ追加
-                do {
-                    // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
-                    path.append(shop)
-                } catch {
-                    isError = true
-                }
-            }
-        }
-        .alert(isPresented: $isError, error: ShopError.saveDataError) {
-            Button("OK"){
-                isError = false
+                context.insert(shop)
+                shopList.append(shop) //編集のためのListへ
+                // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
+                path.append(shop)
             }
         }
     }
     
-    private func deleteItem(at offsets: IndexSet) {
+    private func deleteShop(at offsets: IndexSet) {
         for index in offsets {
             let selectedItem = savedShopList[index]
             context.delete(selectedItem)
             shopList.remove(atOffsets: offsets)
-        }
-        do {
-            try context.save()
-        } catch {
-            isError = true
         }
     }
     

@@ -8,7 +8,7 @@
 import SwiftUI
 
 // 新規のお店を追加するためのView
-struct AddShopSheetView: View {
+struct ShopSheetView: View {
     
     @Environment(\.dismiss) private var dismiss
     @State private var shopName = ""
