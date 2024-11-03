@@ -9,11 +9,46 @@ import SwiftUI
 
 struct FilePathDemo: View {
     
+    @State private var showSheet = false
+    @State private var selectedImage: UIImage?
+    @State private var isPickerPresented = false
+    @State private var shopList:[SampleShop] = []// 表示と編集のためのプロパティ
+    let filePathManager = FilePathManager()
+    
     var body: some View {
-        Button("実行") {
-            self.writingToFile(text: "SwiftDataの実験")
-            
-            print("【ファイル内容】\(self.readFromFile())")
+        
+        VStack {
+            if let selectedImage {
+                Image(uiImage: selectedImage)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.blue)
+                    .frame(width: 200, height: 200)
+                    .onTapGesture {
+                        isPickerPresented = true
+                    }
+            } else {
+                Image(systemName: "photo.badge.plus")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.blue)
+                    .frame(width: 200, height: 200)
+                    .onTapGesture {
+                        isPickerPresented = true
+                    }
+            }
+            Button("実行") {
+                showSheet = true
+                print("【ファイル内容】\(self.readFromFile())")
+            }
+        }
+        .sheet(isPresented: $showSheet) {
+            FileSheetTest { shopName, path in
+                let sampleShop = SampleShop(name: shopName, imagePathURL: path, goods: [])
+                let image = filePathManager.readFromFile(shopName: shopName)
+                selectedImage = image
+                shopList.append(sampleShop)
+            }
         }
     }
     

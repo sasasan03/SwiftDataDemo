@@ -11,43 +11,58 @@ import SwiftUI
 struct FilePathManager {
     
     //　書き込み
-    func writingToFile(shop: Shop, text: String) {
+    // TODO: リファクタ
+    // data → UIImage → data
+    func writingToFile(shopName: String,data: Data) -> String {
         guard let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            fatalError("フォルダURL取得エラー")
+            fatalError("ドキュメントがない")
         }
         
-        //保存する画像の名前
-        let fileName: String? = "\(String(describing: shop.imageData))"
+        //ドキュメントURLにファイルの名前を繋げる
+        let fileURL = documentURL.appendingPathComponent(shopName)
         
-        let fileURL = documentURL.appendingPathComponent(fileName!)
+        //引数のdataをUIImgageへ
+        guard let uiImage = UIImage(data: data) else {
+            fatalError("UiImageがnil")
+        }
         
         //TODO: 強制アンラップを修正
-        let jpegImageData = UIImage(data: shop.imageData!)!.jpegData(compressionQuality: 0.8)
+        //U
+        let jpegImageData = uiImage.jpegData(compressionQuality: 0.8)
         
         do {
+            // ファイルにjpegのデータを書き込む
             try jpegImageData!.write(to: fileURL, options: .atomic)
         } catch {
             print("#Error:\(error)")
         }
+        print("🍔",fileURL.absoluteString)
+        return fileURL.absoluteString
     }
     
     // 読みこみ
-    func readFromFile() -> String {
-        
-        guard let dirURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            fatalError("フォルダURL取得エラー")
+    func readFromFile(shopName: String) -> UIImage {
+        //documentURLを取得する
+        do {
+            // ドキュメントのURLを取得する
+            guard let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                fatalError("フォルダURL取得エラー")
+            }
+            
+            //取得してきたいファイルのURLを取得する
+            let fileURL = documentURL.appendingPathComponent(shopName)
+            
+            //取得してきたURL型をData型へ変換する
+            let imageData = try Data(contentsOf: fileURL)
+            
+            //
+            guard let uiImage = UIImage(data: imageData) else {
+                fatalError("データを画像へ変換するのに失敗しました。")
+            }
+            
+            return uiImage
+        } catch {
+            fatalError("画像データの生成に失敗しました")
         }
-        
-        let fileURL = dirURL.appendingPathComponent("output.txt")
-        
-        guard let fileContnts = try? String(contentsOf: fileURL) else {
-            fatalError("ファイルの読み込みエラー")
-        }
-        
-        return fileContnts
-        
     }
-
-    
 }
-
