@@ -8,12 +8,10 @@
 import Foundation
 import SwiftUI
 
-struct FilePathManager {
+struct ImageFileManager {
     
     //　書き込み
-    // TODO: リファクタ
-    // data → UIImage → data
-    func writingToFile(shopName: String,data: Data) -> String {
+    func writingToFile(shopName: String,uiImage: UIImage) -> String {
         guard let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             fatalError("ドキュメントがない")
         }
@@ -21,13 +19,7 @@ struct FilePathManager {
         //ドキュメントURLにファイルの名前を繋げる
         let fileURL = documentURL.appendingPathComponent(shopName)
         
-        //引数のdataをUIImgageへ
-        guard let uiImage = UIImage(data: data) else {
-            fatalError("UiImageがnil")
-        }
-        
-        //TODO: 強制アンラップを修正
-        //U
+        //画像をデータへ変換
         let jpegImageData = uiImage.jpegData(compressionQuality: 0.8)
         
         do {
@@ -36,7 +28,7 @@ struct FilePathManager {
         } catch {
             print("#Error:\(error)")
         }
-        print("🍔",fileURL.absoluteString)
+        print("🍔ファイルパス",fileURL.absoluteString)
         return fileURL.absoluteString
     }
     

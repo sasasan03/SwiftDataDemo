@@ -8,16 +8,12 @@
 import SwiftUI
 import SwiftData
 
-// ②modelContinerを作成
-
 @main
 struct SwiftDataDemoApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: [SampleShop.self])
-//        .modelContainer(for: [Shop.self])
-//        .modelContainer(for: [Item.self])
+        .modelContainer(for: [Shop.self])
     }
 }

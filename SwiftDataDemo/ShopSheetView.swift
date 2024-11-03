@@ -11,10 +11,11 @@ import SwiftUI
 struct ShopSheetView: View {
     
     @Environment(\.dismiss) private var dismiss
-    @State private var shopName = ""
+    @State private var shopName = "" //TODO: パスが重複してしまうと、書き込み取り出しができなくなるのでバリデーション処理を追加する
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
-    let saveShopData: (String, Data) -> Void
+    let imageFileManager = ImageFileManager()
+    let saveShopData: (String, String) -> Void
     
     var body: some View {
         NavigationStack {
@@ -48,13 +49,15 @@ struct ShopSheetView: View {
                     // もしも、写真が選ばれたら、その写真を保存し、選ばれなかった場合はデフォルトの画像を用意する。
                     Button("追加"){
                         dismiss()
-                        guard !shopName.isEmpty else { return print("#お店の名前を入力してください") }
-                        if let selectedImage, let imageData = selectedImage.jpegData(compressionQuality: 0.8) {
-                            saveShopData(shopName,imageData)
+                        guard !shopName.isEmpty else { fatalError("ドキュメントがない") }
+                        if let selectedImage {
+                            let imageURL = imageFileManager.writingToFile(shopName: shopName, uiImage: selectedImage)
+                            saveShopData(shopName,imageURL)
                             
                         } else {
-                            guard let defultImage = UIImage(systemName: "photo")?.jpegData(compressionQuality: 0.8) else { return }
-                            saveShopData(shopName, defultImage)
+                            let photoImage = UIImage(systemName: "photo")!//確実に存在する画像
+                            let defaultImageURL = imageFileManager.writingToFile(shopName: shopName, uiImage: photoImage)
+                            saveShopData(shopName, defaultImageURL)
                         }
                     }
                 }

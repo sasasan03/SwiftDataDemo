@@ -23,7 +23,7 @@ struct ShopView: View {
                 // 上部の一つだけ変わったセル
                 AddShopRowView()
                     .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())//ヒットテストをframeの箇所まで伸ばす。
+                    .contentShape(Rectangle())
                     .onTapGesture {
                         showAddShopView = true
                     }
@@ -35,7 +35,7 @@ struct ShopView: View {
                 }
                 .onDelete(perform: deleteShop)
             }
-            .listStyle(.grouped) //変わった感じのListでおもろそうだったので使ってみた。
+            .listStyle(.grouped)
             .navigationTitle("お店一覧")
             .navigationDestination(for:  Shop.self, destination: { shop in
                 GoodsView(shop: shop)
@@ -47,8 +47,8 @@ struct ShopView: View {
         }
         .sheet(isPresented: $showAddShopView) {
             // 新しく作成するお店（名前とデータ）をもらってきて保存する。
-            ShopSheetView() { shopName, shopImage in
-                let shop = Shop(name: shopName, imageData: shopImage, goods: [])
+            ShopSheetView() { shopName, imagePathURL in
+                let shop = Shop(name: shopName, imagePathURL: imagePathURL, goods: [])
                 context.insert(shop)
                 shopList.append(shop) //編集のためのListへ
                 // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
@@ -69,36 +69,32 @@ struct ShopView: View {
 
 // 追加されたお店の雛形
 private struct ShopRowView: View {
-    let shop: Shop?
+    
+    let imageFileManager = ImageFileManager()
+    let shop: Shop
+    
     var body: some View {
+        
         HStack{
             //画像
-            if let imageData = shop?.imageData {
-                Image(uiImage: UIImage(data: imageData)!)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-            } else {
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 50, height: 50)
-            }
+            let shopName = shop.name
+            let uiImage = imageFileManager.readFromFile(shopName: shopName)
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 50, height: 50)
             //お店の名前
             VStack {
                 Spacer()//🍔中央寄せ
                 HStack {
-                    if let shopName = shop?.name {
-                        Text(shopName)
-                    } else {
-                        Text("ショップ名なし（エラー）")
-                    }
+                    Text(shopName)
                     Spacer()//名前を左に寄せる
                 }//下線
                 Spacer()//🍔中央寄せ
             }
             Spacer()
         }
+        
     }
 }
 

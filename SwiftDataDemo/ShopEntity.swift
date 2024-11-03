@@ -13,12 +13,12 @@ import SwiftData
 class Shop: Identifiable {
     var id = UUID()
     var name: String
-    var imageData: Data?
+    var imagePathURL: String?
     var goods: [Good]
     
-    init(name: String, imageData: Data? ,goods: [Good]) {
+    init(name: String, imagePathURL: String? ,goods: [Good]) {
         self.name = name
-        self.imageData = imageData
+        self.imagePathURL = imagePathURL
         self.goods = goods
     }
 }

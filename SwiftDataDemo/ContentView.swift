@@ -15,10 +15,10 @@ struct ContentView: View {
 //        SimpleData()
         
         //🟥AEONのView
-//        ShopView()
+        ShopView()
         
         //🟥ファイルパスのデモ
-        FilePathDemo()
+//        FilePathDemo()
     }
 }
 
