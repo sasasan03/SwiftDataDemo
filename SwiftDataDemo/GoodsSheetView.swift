@@ -8,35 +8,35 @@
 import SwiftUI
 
 // グッズの修正か追加を行うためのシート
-struct GoodSheetView: View {
+struct GoodsSheetView: View {
     
     @Environment(\.dismiss) private var dismiss
-    @State private var goodName = ""
-    @State private var goodPrice = ""
+    @State private var goodsName = ""
+    @State private var goodsPrice = ""
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
-    let good: Good?
-    let saveGood: (Good) -> Void
+    let goods: Goods?
+    let saveGoods: (Goods) -> Void
     
-    init(good: Good?, saveGood:  @escaping (Good) -> Void ){
+    init(goods: Goods?, saveGood:  @escaping (Goods) -> Void ){
         //初期化タイミングでどちらの追加か編集かを決定する。
-        if let good {
-            goodName = good.name
-            goodPrice = String(good.price)
-            if let imageData = good.imageData {
+        if let goods {
+            goodsName = goods.name
+            goodsPrice = String(goods.price)
+            if let imageData = goods.imageData {
                 selectedImage = UIImage(data: imageData)
             } else {
                 selectedImage = UIImage(systemName: "photo")
             }
         }
-        self.good = good
-        self.saveGood = saveGood
+        self.goods = goods
+        self.saveGoods = saveGood
     }
     
     var body: some View {
         NavigationStack {
             VStack {
-                if let good { //グッズ編集画面(すでに画像、名前、金額を持っている)
+                if let goods { //グッズ編集画面(すでに画像、名前、金額を持っている)
                     if let selectedImage {
                         Image(uiImage:  selectedImage)
                             .resizable()
@@ -55,11 +55,11 @@ struct GoodSheetView: View {
                                 isPickerPresented = true
                             }
                     }
-                    TextField(good.name, text: $goodName)
+                    TextField(goods.name, text: $goodsName)
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 250)
                         .padding()
-                    TextField(String(good.price), text: $goodPrice)
+                    TextField(String(goods.price), text: $goodsPrice)
                         .textFieldStyle(.roundedBorder)
                         .frame(width: 250)
                         .padding()
@@ -88,7 +88,7 @@ struct GoodSheetView: View {
                         Text("グッズ名")
                             .font(.headline)
                             .frame(width: 80)
-                        TextField("グッズを入力してください。", text: $goodName)
+                        TextField("グッズを入力してください。", text: $goodsName)
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.trailing)
                         Text("")
@@ -98,7 +98,7 @@ struct GoodSheetView: View {
                         Text("金額")
                             .font(.headline)
                             .frame(width: 80)
-                        TextField("金額を入力してください。", text: $goodPrice)
+                        TextField("金額を入力してください。", text: $goodsPrice)
                             .textFieldStyle(.roundedBorder)
                             .keyboardType(.numberPad)
                             .multilineTextAlignment(.trailing)
@@ -122,9 +122,9 @@ struct GoodSheetView: View {
                     // TODO: エラー処理
                     Button { //入力したデータを前のViewへ渡して保存してもらう
                         let selectImage = selectedImage?.jpegData(compressionQuality: 1.0)
-                        let goodPrice = Int(goodPrice) ?? 0
-                        let good = Good(name: goodName, price: goodPrice, imageData: selectImage)
-                        saveGood(good)
+                        let goodPrice = Int(goodsPrice) ?? 0
+                        let goods = Goods(name: goodsName, price: goodPrice, imageData: selectImage)
+                        saveGoods(goods)
                         dismiss()
                     } label: {
                         Text("保存")

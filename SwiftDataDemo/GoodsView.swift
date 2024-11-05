@@ -12,8 +12,8 @@ struct GoodsView: View {
     
     @Bindable var shop: Shop
     @State private var showAddModal = false
-    @State private var selectedGood: Good?
-    @State private var goodName = ""
+    @State private var selectedGoods: Goods?
+    @State private var goodsName = ""
     @State private var isError = false
     
     var body: some View {
@@ -24,29 +24,29 @@ struct GoodsView: View {
                 .onTapGesture {
                     showAddModal = true
                 }
-            ForEach(shop.goods) { good in
-                GoodRowView(good: good)
+            ForEach(shop.goodsList) { good in
+                GoodRowView(goods: good)
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        selectedGood = good
+                        selectedGoods = good
                     }
             }
-            .onDelete(perform: deleteGood)
+            .onDelete(perform: deleteGoods)
         }
         .listStyle(.grouped)
-        .sheet(item: $selectedGood) { selectedGood in //タップされたグッズの編集のシートを開く
-            GoodSheetView(good: selectedGood) { saveGood in
-                if let index = shop.goods.firstIndex(where: { $0 == selectedGood }) {
-                    shop.goods[index] = saveGood
+        .sheet(item: $selectedGoods) { selectedGood in //タップされたグッズの編集のシートを開く
+            GoodsSheetView(goods: selectedGood) { saveGood in
+                if let index = shop.goodsList.firstIndex(where: { $0 == selectedGood }) {
+                    shop.goodsList[index] = saveGood
                 } else {
                     isError = true
                 }
             }
         }
         .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシートを開く
-            GoodSheetView(good: nil) { good in
-                shop.goods.append(good)
+            GoodsSheetView(goods: nil) { goods in
+                shop.goodsList.append(goods)
             }
         }
         .navigationTitle("『\(shop.name)』編集画面")
@@ -57,8 +57,8 @@ struct GoodsView: View {
         }
     }
     
-    private func deleteGood(at offsets: IndexSet) {
-        shop.goods.remove(atOffsets: offsets)
+    private func deleteGoods(at offsets: IndexSet) {
+        shop.goodsList.remove(atOffsets: offsets)
     }
     
 }
@@ -66,12 +66,12 @@ struct GoodsView: View {
 
 // 追加された商品の雛形
 private struct GoodRowView: View {
-    let good: Good?
+    let goods: Goods?
     var body: some View {
         HStack{
-            if let good {
+            if let goods {
                 //画像
-                if let imageData = good.imageData {
+                if let imageData = goods.imageData {
                     Image(uiImage: UIImage(data: imageData)!)
                         .resizable()
                         .scaledToFit()
@@ -86,16 +86,15 @@ private struct GoodRowView: View {
                 VStack {
                     Spacer()//🍔縦中央寄せ
                     HStack {
-                        Text(good.name)
+                        Text(goods.name)
                         Spacer()//名前を左に寄せる
-                        Text("\(good.price)円")
+                        Text("\(goods.price)円")
                     }//下線
                     Spacer()//🍔縦中央寄せ
                 }
                 Spacer()
             } else {
-                // TODO: エラー
-                Text("ももひき")
+                Text("グッズを追加してください")
             }
         }
     }

@@ -57,4 +57,42 @@ struct ImageFileManager {
             fatalError("画像データの生成に失敗しました")
         }
     }
+    
+    
+    func getShopDirectory(for shopName: String) -> URL? {
+        let fileManager = FileManager.default
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        let shopURL = documentsURL.appendingPathComponent(shopName)
+        
+        // ディレクトリが存在しない場合は作成
+        if !fileManager.fileExists(atPath: shopURL.path) {
+            do {
+                try fileManager.createDirectory(at: shopURL, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("Failed to create shop directory: \(error)")
+                return nil
+            }
+        }
+        return shopURL
+    }
+    
+    func saveGoodsImageToShopDirectory(_ image: UIImage, fileName: String, shopName: String) -> String? {
+        guard let imageData = image.jpegData(compressionQuality: 0.8),
+              let shopURL = getShopDirectory(for: shopName) else {
+            return nil
+        }
+        
+        let fileURL = shopURL.appendingPathComponent(fileName)
+        
+        do {
+            try imageData.write(to: fileURL)
+            return fileURL.lastPathComponent  // ファイル名を返す
+        } catch {
+            print("Failed to save image to shop directory: \(error)")
+            return nil
+        }
+    }
+    
 }

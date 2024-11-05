@@ -51,12 +51,12 @@ struct ShopSheetView: View {
                         dismiss()
                         guard !shopName.isEmpty else { fatalError("ドキュメントがない") }
                         if let selectedImage {
-                            let imageURL = imageFileManager.writingToFile(shopName: shopName, uiImage: selectedImage)
+                            let imageURL = imageFileManager.writingToFile(shopID: shopName, uiImage: selectedImage)
                             saveShopData(shopName,imageURL)
                             
                         } else {
                             let photoImage = UIImage(systemName: "photo")!//確実に存在する画像
-                            let defaultImageURL = imageFileManager.writingToFile(shopName: shopName, uiImage: photoImage)
+                            let defaultImageURL = imageFileManager.writingToFile(shopID: shopName, uiImage: photoImage)
                             saveShopData(shopName, defaultImageURL)
                         }
                     }

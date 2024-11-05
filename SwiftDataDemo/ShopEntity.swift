@@ -14,60 +14,25 @@ class Shop: Identifiable {
     var id = UUID()
     var name: String
     var imagePathURL: String?
-    var goods: [Good]
+    var goodsList: [Goods]
     
-    init(name: String, imagePathURL: String? ,goods: [Good]) {
+    init(name: String, imagePathURL: String? ,goods: [Goods]) {
         self.name = name
         self.imagePathURL = imagePathURL
-        self.goods = goods
+        self.goodsList = goods
     }
 }
 
 //お店にある商品
 @Model
-class Good: Identifiable {
+class Goods: Identifiable {
     var id = UUID()
     var name: String
     var price: Int
-    var imageData: Data?
-    init(name: String, price: Int, imageData: Data?) {
-        self.name = name
-        self.price = price
-        self.imageData = imageData
-    }
-}
-
-
-
-
-
-
-
-//Pathを指定テストのお店
-@Model
-class SampleShop: Identifiable {
-    var id = UUID()
-    var name: String
     var imagePathURL: String?
-    var goods: [Good]
-    
-    init(name: String, imagePathURL: String? ,goods: [Good]) {
-        self.name = name
-        self.imagePathURL = imagePathURL
-        self.goods = goods
-    }
-}
-
-//Pathを指定テストのお店
-@Model
-class SampleGood: Identifiable {
-    var id = UUID()
-    var name: String
-    var price: Int
-    var imageData: Data?
-    init(name: String, price: Int, imageData: Data?) {
+    init(name: String, price: Int, imagePathURL: String?) {
         self.name = name
         self.price = price
-        self.imageData = imageData
+        self.imagePathURL = imagePathURL
     }
 }
