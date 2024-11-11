@@ -15,6 +15,7 @@ struct GoodsView: View {
     @State private var selectedGoods: Goods?
     @State private var goodsName = ""
     @State private var isError = false
+    let imageFileManager = ImageFileManager()
     
     var body: some View {
         List {
@@ -25,7 +26,7 @@ struct GoodsView: View {
                     showAddModal = true
                 }
             ForEach(shop.goodsList) { good in
-                GoodRowView(goods: good)
+                GoodRowView(shop: shop, goods: good)
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
@@ -36,16 +37,22 @@ struct GoodsView: View {
         }
         .listStyle(.grouped)
         .sheet(item: $selectedGoods) { selectedGood in //タップされたグッズの編集のシートを開く
-            GoodsSheetView(goods: selectedGood) { saveGood in
-                if let index = shop.goodsList.firstIndex(where: { $0 == selectedGood }) {
-                    shop.goodsList[index] = saveGood
-                } else {
-                    isError = true
-                }
+            GoodsSheetView(shop: shop ,goods: selectedGood) { saveGoods in
+//                if let index = shop.goodsList.firstIndex(where: { $0 == selectedGood }) {
+//                    // 画像の保存を行う。どこに保存したのかのURLが欲しい
+//                    let imagePathURL = imageFileManager.editGoodsImage(shop: shop,selectedGood: selectedGood ,image: saveGoods.image!)
+//                    let goods = Goods(name: saveGoods.name, price: saveGoods.price, imagePathURL: imagePathURL)
+//                    shop.goodsList[index] = goods
+//                } else {
+//                    isError = true
+//                }
             }
         }
         .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシートを開く
-            GoodsSheetView(goods: nil) { goods in
+            GoodsSheetView(shop: shop, goods: nil) { saveGoods in
+                guard let image = saveGoods.image else { fatalError("imageがnil") }
+                let strGoodsURL = imageFileManager.saveGoodsImage(shopName: shop.name, goodsName: saveGoods.name, uiImage: image)
+                let goods = Goods(name: saveGoods.name, price: saveGoods.price, imagePathURL: strGoodsURL)
                 shop.goodsList.append(goods)
             }
         }
@@ -66,22 +73,21 @@ struct GoodsView: View {
 
 // 追加された商品の雛形
 private struct GoodRowView: View {
+    
+    let imageFileManager = ImageFileManager()
+    let shop: Shop
     let goods: Goods?
+    
     var body: some View {
         HStack{
             if let goods {
                 //画像
-                if let imageData = goods.imageData {
-                    Image(uiImage: UIImage(data: imageData)!)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 50, height: 50)
-                } else {
-                    Image(systemName: "photo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 50, height: 50)
-                }
+                let goodUiImage = imageFileManager.loadGoodsImage(shopName: shop.name, goodsName: goods.name)
+                Image(uiImage: goodUiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                
                 //グッズの名前
                 VStack {
                     Spacer()//🍔縦中央寄せ

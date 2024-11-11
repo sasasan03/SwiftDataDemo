@@ -15,7 +15,7 @@ struct ShopSheetView: View {
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
     let imageFileManager = ImageFileManager()
-    let saveShopData: (String, String) -> Void
+    let saveShopData: (String, UIImage) -> Void
     
     var body: some View {
         NavigationStack {
@@ -48,17 +48,15 @@ struct ShopSheetView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     // もしも、写真が選ばれたら、その写真を保存し、選ばれなかった場合はデフォルトの画像を用意する。
                     Button("追加"){
-                        dismiss()
-                        guard !shopName.isEmpty else { fatalError("ドキュメントがない") }
+                        guard !shopName.isEmpty else { fatalError("shopNameが空") }
                         if let selectedImage {
-                            let imageURL = imageFileManager.writingToFile(shopID: shopName, uiImage: selectedImage)
-                            saveShopData(shopName,imageURL)
+                            saveShopData(shopName,selectedImage)
                             
                         } else {
                             let photoImage = UIImage(systemName: "photo")!//確実に存在する画像
-                            let defaultImageURL = imageFileManager.writingToFile(shopID: shopName, uiImage: photoImage)
-                            saveShopData(shopName, defaultImageURL)
+                            saveShopData(shopName, photoImage)
                         }
+                        dismiss()
                     }
                 }
                 ToolbarItem(placement: .topBarLeading) {

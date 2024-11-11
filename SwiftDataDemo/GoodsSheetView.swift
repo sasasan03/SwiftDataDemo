@@ -10,25 +10,35 @@ import SwiftUI
 // グッズの修正か追加を行うためのシート
 struct GoodsSheetView: View {
     
+    // UIImageはGoodsViewへ渡したあとに保存したかたため、この型を使用
+    struct SaveGood {
+        var name: String
+        var price: Int
+        var image: UIImage?
+    }
+    
     @Environment(\.dismiss) private var dismiss
     @State private var goodsName = ""
     @State private var goodsPrice = ""
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
+    let imageFileManager = ImageFileManager()
+    let shop: Shop
     let goods: Goods?
-    let saveGoods: (Goods) -> Void
+    let saveGoods: (SaveGood) -> Void
     
-    init(goods: Goods?, saveGood:  @escaping (Goods) -> Void ){
+    init(shop: Shop ,goods: Goods?, saveGood:  @escaping (SaveGood) -> Void){
         //初期化タイミングでどちらの追加か編集かを決定する。
         if let goods {
             goodsName = goods.name
             goodsPrice = String(goods.price)
-            if let imageData = goods.imageData {
-                selectedImage = UIImage(data: imageData)
-            } else {
-                selectedImage = UIImage(systemName: "photo")
-            }
+//            if let imageURL = goods.imagePathURL, let uiImage = imageFileManager.loadImageFromShopDirectory(fileName: imageURL, shopName: shop.name) {
+//                selectedImage = uiImage
+//            } else {
+//                selectedImage = UIImage(systemName: "photo")
+//            }
         }
+        self.shop = shop
         self.goods = goods
         self.saveGoods = saveGood
     }
@@ -119,12 +129,10 @@ struct GoodsSheetView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    // TODO: エラー処理
-                    Button { //入力したデータを前のViewへ渡して保存してもらう
-                        let selectImage = selectedImage?.jpegData(compressionQuality: 1.0)
+                    Button { //入力したデータを前のViewへ渡して保存してもらう。
                         let goodPrice = Int(goodsPrice) ?? 0
-                        let goods = Goods(name: goodsName, price: goodPrice, imageData: selectImage)
-                        saveGoods(goods)
+                        let goodsItem = SaveGood(name: goodsName, price: goodPrice, image: selectedImage)
+                        saveGoods(goodsItem)
                         dismiss()
                     } label: {
                         Text("保存")

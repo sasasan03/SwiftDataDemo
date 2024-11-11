@@ -9,10 +9,22 @@ import SwiftData
 
 struct ShopView: View {
     
+//    https://www.hackingwithswift.com/quick-start/swiftdata/how-to-use-mvvm-to-separate-swiftdata-from-your-views
+//    var number: [Int] {
+//    get {
+//        // カスタムのゲッター
+//        return numberData
+//    }
+//    set {
+//        // カスタムのセッター
+//        numberData = newValue
+//    }
+//}
+    
     @Environment(\.modelContext) var context
     @Query private var savedShopList:[Shop] = []//get_onlyのプロパティ
     @State private var path: [Shop] = []
-    @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ
+    @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ。コンピューテッドプロパティにする。
     @State private var showAddShopView = false
     @State private var isError = false
     
@@ -47,10 +59,15 @@ struct ShopView: View {
         }
         .sheet(isPresented: $showAddShopView) {
             // 新しく作成するお店（名前とデータ）をもらってきて保存する。
-            ShopSheetView() { shopName, imagePathURL in
+            ShopSheetView() { shopName, uiImage in
+                let imageFileManager = ImageFileManager()
+                //イメージを保存するためのパスを取得（shopの型へ入れるため）
+                let imagePathURL = imageFileManager.shopURL(shopName: shopName)
+                //sheetから受け取った画像をアプリ内に保存する
+                let _ = imageFileManager.saveShopImage(shopName: shopName, uiImage: uiImage)
                 let shop = Shop(name: shopName, imagePathURL: imagePathURL, goods: [])
                 context.insert(shop)
-                shopList.append(shop) //編集のためのListへ
+                shopList.append(shop)
                 // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
                 path.append(shop)
             }
@@ -78,7 +95,7 @@ private struct ShopRowView: View {
         HStack{
             //画像
             let shopName = shop.name
-            let uiImage = imageFileManager.readFromFile(shopName: shopName)
+            let uiImage = imageFileManager.loadShopImage(shopName: shopName)
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFit()
