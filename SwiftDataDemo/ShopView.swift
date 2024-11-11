@@ -62,14 +62,18 @@ struct ShopView: View {
             ShopSheetView() { shopName, uiImage in
                 let imageFileManager = ImageFileManager()
                 //イメージを保存するためのパスを取得（shopの型へ入れるため）
-                let imagePathURL = imageFileManager.shopURL(shopName: shopName)
-                //sheetから受け取った画像をアプリ内に保存する
-                let _ = imageFileManager.saveShopImage(shopName: shopName, uiImage: uiImage)
-                let shop = Shop(name: shopName, imagePathURL: imagePathURL, goods: [])
-                context.insert(shop)
-                shopList.append(shop)
-                // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
-                path.append(shop)
+                do {
+                    let imagePathURL = try imageFileManager.shopURL(shopName: shopName)
+                    //sheetから受け取った画像をアプリ内に保存する
+                    let _ = imageFileManager.saveShopImage(shopName: shopName, uiImage: uiImage)
+                    let shop = Shop(name: shopName, imagePathURL: imagePathURL, goods: [])
+                    context.insert(shop)
+                    shopList.append(shop)
+                    // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
+                    path.append(shop)
+                } catch {
+                    // アラートを表示させる処理を追加したい。
+                }
             }
         }
     }

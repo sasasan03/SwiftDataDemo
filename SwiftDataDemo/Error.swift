@@ -20,3 +20,30 @@ enum ShopError: LocalizedError {
         }
     }
 }
+
+enum ImageFileManagerError: LocalizedError {
+    case documentURLNotFound
+    case invalidFilePath
+    case imageCreationFailed
+    case dataConversionFailed
+    case shopURLNotFound
+    case goodsURLNotFound
+
+    var errorDescription: String? {
+        switch self {
+        case .documentURLNotFound:
+            return "ドキュメントURLが見つかりませんでした。"
+        case .invalidFilePath:
+            return "無効なファイルパスです。"
+        case .imageCreationFailed:
+            return "画像の作成に失敗しました。"
+        case .dataConversionFailed:
+            return "データの画像変換に失敗しました。"
+        case .shopURLNotFound:
+            return "shopのURLが見つかりませんでした。"
+        case .goodsURLNotFound:
+            return "goodsのURLが見つかりませんでした。"
+        }
+    }
+}
+
