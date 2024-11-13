@@ -40,11 +40,25 @@ struct ImageFileManager {
             let shopImagePath = shopURL.appendingPathComponent("\(shopName).jpeg")
             //書き込む
             try imageData.write(to: shopImagePath)
-            
         } catch {
             print("#### error", error.localizedDescription)
         }
 
+    }
+    
+    // 写真を削除する
+    func deleteShopImage(shopName: String) {
+        do {
+            guard let shopURL = URL(string: try shopURL(shopName: shopName)) else { throw ImageFileManagerError.shopURLNotFound }
+            
+            let shopImagePath = shopURL.appendingPathComponent("\(shopName).jpeg")
+            print("#消去前のURL",shopImagePath)
+            try fileManager.removeItem(at: shopURL)
+            print("#消去完了")
+            
+        } catch {
+            print("####error",error.localizedDescription)
+        }
     }
     
     /// ショップの画像読みこみ。UIImageを返す

@@ -27,6 +27,7 @@ struct ShopView: View {
     @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ。コンピューテッドプロパティにする。
     @State private var showAddShopView = false
     @State private var isError = false
+    let imageFileManager = ImageFileManager()
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -60,7 +61,6 @@ struct ShopView: View {
         .sheet(isPresented: $showAddShopView) {
             // 新しく作成するお店（名前とデータ）をもらってきて保存する。
             ShopSheetView() { shopName, uiImage in
-                let imageFileManager = ImageFileManager()
                 //イメージを保存するためのパスを取得（shopの型へ入れるため）
                 do {
                     let imagePathURL = try imageFileManager.shopURL(shopName: shopName)
@@ -72,6 +72,7 @@ struct ShopView: View {
                     // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
                     path.append(shop)
                 } catch {
+                    print("#アラートを表示させたい")
                     // アラートを表示させる処理を追加したい。
                 }
             }
@@ -80,6 +81,8 @@ struct ShopView: View {
     
     private func deleteShop(at offsets: IndexSet) {
         for index in offsets {
+            let shopName = shopList[index].name
+            imageFileManager.deleteShopImage(shopName: shopName)
             let selectedShop = savedShopList[index]
             context.delete(selectedShop)
             shopList.remove(atOffsets: offsets)
