@@ -50,9 +50,8 @@ struct ImageFileManager {
     func deleteShopImage(shopName: String) {
         do {
             guard let shopURL = URL(string: try shopURL(shopName: shopName)) else { throw ImageFileManagerError.shopURLNotFound }
-            
-            let shopImagePath = shopURL.appendingPathComponent("\(shopName).jpeg")
-            try fileManager.removeItem(at: shopImagePath)
+            // 保存してある、ファイルごと消去する
+            try fileManager.removeItem(at: shopURL)
             
         } catch {
             print("####error",error.localizedDescription)

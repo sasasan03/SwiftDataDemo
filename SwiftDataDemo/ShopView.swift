@@ -9,18 +9,6 @@ import SwiftData
 
 struct ShopView: View {
     
-//    https://www.hackingwithswift.com/quick-start/swiftdata/how-to-use-mvvm-to-separate-swiftdata-from-your-views
-//    var number: [Int] {
-//    get {
-//        // カスタムのゲッター
-//        return numberData
-//    }
-//    set {
-//        // カスタムのセッター
-//        numberData = newValue
-//    }
-//}
-    
     @Environment(\.modelContext) var context
     @Query private var savedShopList:[Shop] = []//get_onlyのプロパティ
     @State private var path: [Shop] = []
@@ -28,19 +16,27 @@ struct ShopView: View {
     @State private var showAddShopView = false
     @State private var isError = false
     let imageFileManager = ImageFileManager()
+//    var shopList: [Shop] { //🟥読み取り専用のため使不可。
+//        get {
+//            return savedShopList
+//        }
+//        set {
+//            savedShopList = newValue
+//        }
+//    }
     
     var body: some View {
         NavigationStack(path: $path) {
             //OnDeleteを使用するためにList使てる
             List {
-                // 上部の一つだけ変わったセル
+                //『ショップを追加する...』
                 AddShopRowView()
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         showAddShopView = true
                     }
-                // 上部一つ以外
+                //追加されたデータがここで表示される
                 ForEach(shopList){ shop in
                     NavigationLink(value: shop) {
                         ShopRowView(shop: shop)
@@ -51,6 +47,7 @@ struct ShopView: View {
             .listStyle(.grouped)
             .navigationTitle("お店一覧")
             .navigationDestination(for:  Shop.self, destination: { shop in
+                // 遷移先に選択されたお店の情報を渡す。
                 GoodsView(shop: shop)
             })
         }
@@ -59,7 +56,7 @@ struct ShopView: View {
             shopList = savedShopList
         }
         .sheet(isPresented: $showAddShopView) {
-            // 新しく作成するお店（名前とデータ）をもらってきて保存する。
+            // 新しく作成するお店（名前とデータ）をシートからもらってきて保存する。
             ShopSheetView() { shopName, uiImage in
                 //イメージを保存するためのパスを取得（shopの型へ入れるため）
                 do {
@@ -67,12 +64,13 @@ struct ShopView: View {
                     //sheetから受け取った画像をアプリ内に保存する
                     let _ = imageFileManager.saveShopImage(shopName: shopName, uiImage: uiImage)
                     let shop = Shop(name: shopName, imagePathURL: imagePathURL, goods: [])
+                    //新しいお店をSwiftDataへ保存する。
                     context.insert(shop)
                     shopList.append(shop)
-                    // 新しいお店をSwiftDataへ保存し、商品を追加するためのViewへ遷移させる。
+                    // 商品を追加するためのViewへ遷移させる。
                     path.append(shop)
                 } catch {
-                    print("#アラートを表示させたい")
+                    print("エラー：shopのURLを生成できませんでした。",error)
                     // アラートを表示させる処理を追加したい。
                 }
             }
@@ -81,8 +79,11 @@ struct ShopView: View {
     
     private func deleteShop(at offsets: IndexSet) {
         for index in offsets {
+            print("#index:『\(index)』")
+            //編集用のデータを削除
             let shopName = shopList[index].name
             imageFileManager.deleteShopImage(shopName: shopName)
+            //swiftDataのデータを削除
             let selectedShop = savedShopList[index]
             context.delete(selectedShop)
             shopList.remove(atOffsets: offsets)
@@ -113,7 +114,7 @@ private struct ShopRowView: View {
                 HStack {
                     Text(shopName)
                     Spacer()//名前を左に寄せる
-                }//下線
+                }
                 Spacer()//🍔中央寄せ
             }
             Spacer()
@@ -141,7 +142,7 @@ private struct AddShopRowView: View {
                             .foregroundStyle(.red)
                     }
                     Spacer()//名前を左に寄せる
-                }//下線
+                }
                 Spacer()//🍔中央寄せ
             }
             Spacer()

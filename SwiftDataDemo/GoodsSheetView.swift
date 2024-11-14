@@ -10,7 +10,7 @@ import SwiftUI
 // グッズの修正か追加を行うためのシート
 struct GoodsSheetView: View {
     
-    // UIImageはGoodsViewへ渡したあとに保存したかたため、この型を使用
+    // タプル型に３つも渡すのはわかりにくいかと思い、構造体を作成
     struct SaveGood {
         var name: String
         var price: Int
