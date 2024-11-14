@@ -12,7 +12,7 @@ struct ImageFileManager {
     
     let fileManager = FileManager.default
     
-    // ショップの画像操作
+    // ショップの画像操作------------------------------------------------------
     /// shopのディレクトリのパスを取得
     /// Viewの中で、Shop型で保存するためString。
     func shopURL(shopName: String) throws -> String {
@@ -46,15 +46,13 @@ struct ImageFileManager {
 
     }
     
-    // 写真を削除する
+    /// ショップの写真をアプリから削除する
     func deleteShopImage(shopName: String) {
         do {
             guard let shopURL = URL(string: try shopURL(shopName: shopName)) else { throw ImageFileManagerError.shopURLNotFound }
             
             let shopImagePath = shopURL.appendingPathComponent("\(shopName).jpeg")
-            print("#消去前のURL",shopImagePath)
-            try fileManager.removeItem(at: shopURL)
-            print("#消去完了")
+            try fileManager.removeItem(at: shopImagePath)
             
         } catch {
             print("####error",error.localizedDescription)
@@ -80,7 +78,7 @@ struct ImageFileManager {
         }
     }
     
-    //グッズの画像操作
+    //グッズの画像操作----------------------------------------------------------------------------
     /// グッズのパスを作成する
     func goodsURL(shopName: String, goodsName: String) throws -> String {
         guard let documentURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
@@ -117,7 +115,7 @@ struct ImageFileManager {
             return goodsImagePath.absoluteString
         } catch {
             print("エラー: \(error)")
-            return "###not found URL."//ここを修正したい
+            return "no exit file path."
         }
     }
     
@@ -143,6 +141,19 @@ struct ImageFileManager {
         }
     }
     
+    func deleteGoodsImage(shopName: String, goodsName: String) {
+        do {
+            guard let goodsURL = URL(string: try goodsURL(shopName: shopName, goodsName: goodsName)) else {
+                throw ImageFileManagerError.invalidFilePath
+            }
+            try fileManager.removeItem(at: goodsURL)//フォルダを削除
+            //画像の削除
+            //            let goodsImagePath = goodsURL.appendingPathComponent("\(goodsName).jpeg")
+            //            try fileManager.removeItem(at: goodsImagePath)//写真を削除
+        } catch {
+            print("#goodsのPathの削除に失敗しました。", error.localizedDescription)
+        }
+    }
 
 }
 

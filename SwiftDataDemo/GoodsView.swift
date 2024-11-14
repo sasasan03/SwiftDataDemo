@@ -38,14 +38,15 @@ struct GoodsView: View {
         .listStyle(.grouped)
         .sheet(item: $selectedGoods) { selectedGood in //タップされたグッズの編集のシートを開く
             GoodsSheetView(shop: shop ,goods: selectedGood) { saveGoods in
-//                if let index = shop.goodsList.firstIndex(where: { $0 == selectedGood }) {
-//                    // 画像の保存を行う。どこに保存したのかのURLが欲しい
-//                    let imagePathURL = imageFileManager.editGoodsImage(shop: shop,selectedGood: selectedGood ,image: saveGoods.image!)
-//                    let goods = Goods(name: saveGoods.name, price: saveGoods.price, imagePathURL: imagePathURL)
-//                    shop.goodsList[index] = goods
-//                } else {
-//                    isError = true
-//                }
+                if let index = shop.goodsList.firstIndex(where: { $0 == selectedGood }) {
+                    imageFileManager.deleteGoodsImage(shopName: shop.name, goodsName: selectedGood.name)
+                    guard let uiImage = saveGoods.image else { return print("#saveGoods.imageがnilです。") }
+                    let imagePathURL = imageFileManager.saveGoodsImage(shopName: shop.name, goodsName: saveGoods.name, uiImage: uiImage)
+                    let editGoods = Goods(name: saveGoods.name, price: saveGoods.price, imagePathURL: imagePathURL)
+                    shop.goodsList[index] = editGoods
+                } else {
+                    print("#編集したグッズのindexを取得することができませんでした。")
+                }
             }
         }
         .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシートを開く
@@ -65,7 +66,10 @@ struct GoodsView: View {
     }
     
     private func deleteGoods(at offsets: IndexSet) {
-        shop.goodsList.remove(atOffsets: offsets)
+        for index in offsets {
+            imageFileManager.deleteGoodsImage(shopName: shop.name, goodsName: shop.goodsList[index].name)
+            shop.goodsList.remove(atOffsets: offsets)
+        }
     }
     
 }

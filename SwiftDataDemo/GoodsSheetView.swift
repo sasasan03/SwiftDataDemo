@@ -32,11 +32,7 @@ struct GoodsSheetView: View {
         if let goods {
             goodsName = goods.name
             goodsPrice = String(goods.price)
-//            if let imageURL = goods.imagePathURL, let uiImage = imageFileManager.loadImageFromShopDirectory(fileName: imageURL, shopName: shop.name) {
-//                selectedImage = uiImage
-//            } else {
-//                selectedImage = UIImage(systemName: "photo")
-//            }
+            selectedImage = imageFileManager.loadGoodsImage(shopName: shop.name, goodsName: goods.name)
         }
         self.shop = shop
         self.goods = goods
@@ -129,7 +125,7 @@ struct GoodsSheetView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { //入力したデータを前のViewへ渡して保存してもらう。
+                    Button { //入力したデータを前のViewへ渡して保存を行う。
                         let goodPrice = Int(goodsPrice) ?? 0
                         let goodsItem = SaveGood(name: goodsName, price: goodPrice, image: selectedImage)
                         saveGoods(goodsItem)
