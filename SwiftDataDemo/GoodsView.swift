@@ -40,8 +40,9 @@ struct GoodsView: View {
             GoodsSheetView(shop: shop ,goods: selectedGood) { saveGoods in
                 if let index = shop.goodsList.firstIndex(where: { $0 == selectedGood }) {
                     imageFileManager.deleteGoodsImage(shopName: shop.name, goodsName: selectedGood.name)
-                    guard let uiImage = saveGoods.image else { return print("#saveGoods.imageがnilです。") }
-                    let imagePathURL = imageFileManager.saveGoodsImage(shopName: shop.name, goodsName: saveGoods.name, uiImage: uiImage)
+                    let imagePathURL = imageFileManager.saveGoodsImage(shopName: shop.name,
+                                                                       goodsName: saveGoods.name,
+                                                                       uiImage: saveGoods.uiImage)
                     let editGoods = Goods(name: saveGoods.name, price: saveGoods.price, imagePathURL: imagePathURL)
                     shop.goodsList[index] = editGoods
                 } else {
@@ -51,8 +52,9 @@ struct GoodsView: View {
         }
         .sheet(isPresented: $showAddModal){ //新しくグッズをついかするためのシートを開く
             GoodsSheetView(shop: shop, goods: nil) { saveGoods in
-                guard let image = saveGoods.image else { fatalError("imageがnil") }
-                let strGoodsURL = imageFileManager.saveGoodsImage(shopName: shop.name, goodsName: saveGoods.name, uiImage: image)
+                let strGoodsURL = imageFileManager.saveGoodsImage(shopName: shop.name,
+                                                                  goodsName: saveGoods.name,
+                                                                  uiImage: saveGoods.uiImage)
                 let goods = Goods(name: saveGoods.name, price: saveGoods.price, imagePathURL: strGoodsURL)
                 shop.goodsList.append(goods)
             }

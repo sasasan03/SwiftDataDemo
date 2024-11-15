@@ -14,6 +14,8 @@ struct ShopSheetView: View {
     @State private var shopName = "" //TODO: パスが重複してしまうと、書き込み取り出しができなくなるのでバリデーション処理を追加する
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
+    @State private var isError = false
+    @State private var shouldConfirmDeletion = false
     let imageFileManager = ImageFileManager()
     let saveShopData: (String, UIImage) -> Void
     
@@ -48,10 +50,14 @@ struct ShopSheetView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     // もしも、写真が選ばれたら、その写真を保存し、選ばれなかった場合はデフォルトの画像を用意する。
                     Button("追加"){
-                        guard !shopName.isEmpty else { fatalError("shopNameが空") }
+                        do {
+                            try checkShopName(shopName: shopName)
+                        } catch {
+                            isError = true
+                            return print("#checkShopName error.")// returnしてモーダルを閉じさせ、GoodsViewへ遷移させない。
+                        }
                         if let selectedImage {
                             saveShopData(shopName,selectedImage)
-                            
                         } else {
                             let photoImage = UIImage(systemName: "photo")!//確実に存在する画像
                             saveShopData(shopName, photoImage)
@@ -61,7 +67,7 @@ struct ShopSheetView: View {
                 }
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
-                        dismiss()
+                        confirmDelete(shopName: shopName)
                     } label: {
                         Text("キャンセル")
                             .foregroundStyle(.red)
@@ -72,8 +78,38 @@ struct ShopSheetView: View {
             .sheet(isPresented: $isPickerPresented) {
                 PhotoPicker(selectedImage: $selectedImage)
             }
+            .alert(isPresented: $isError, error: ShopError.emptyShopName) {
+                Button("OK"){
+                    isError = false
+                }
+            }
+            .alert("変更は保存されませんがよろしいですか？", isPresented: $shouldConfirmDeletion) {
+                HStack {
+                    Button("はい"){
+                        dismiss()
+                    }
+                    Button("いいえ"){
+                        return
+                    }
+                }
+            }
         }
     }
+    
+    private func checkShopName(shopName: String) throws {
+        guard !shopName.isEmpty else {
+            throw ShopError.emptyShopName
+        }
+    }
+    
+    private func confirmDelete(shopName: String){
+        if !shopName.isEmpty { //空でなければアラートを表示させる
+            shouldConfirmDeletion = true
+        } else { //shopNameが空であれば閉じる
+            dismiss()
+        }
+    }
+    
 }
 
 

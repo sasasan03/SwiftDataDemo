@@ -10,11 +10,11 @@ import SwiftUI
 // グッズの修正か追加を行うためのシート
 struct GoodsSheetView: View {
     
-    // タプル型に３つも渡すのはわかりにくいかと思い、構造体を作成
+    // タプル型に３つはわかりにくため、構造体へ
     struct SaveGood {
         var name: String
         var price: Int
-        var image: UIImage?
+        var uiImage: UIImage
     }
     
     @Environment(\.dismiss) private var dismiss
@@ -22,17 +22,23 @@ struct GoodsSheetView: View {
     @State private var goodsPrice = ""
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
+    @State private var isError = false
+    @State private var errorText = ""
     let imageFileManager = ImageFileManager()
     let shop: Shop
     let goods: Goods?
     let saveGoods: (SaveGood) -> Void
     
     init(shop: Shop ,goods: Goods?, saveGood:  @escaping (SaveGood) -> Void){
-        //初期化タイミングでどちらの追加か編集かを決定する。
+        // 遷移時にGoodsを持ってた場合、渡されてきたGoodsをリストへ反映させる
         if let goods {
             goodsName = goods.name
             goodsPrice = String(goods.price)
             selectedImage = imageFileManager.loadGoodsImage(shopName: shop.name, goodsName: goods.name)
+        } else {
+            goodsName = "グッズを入力してください。"
+            goodsPrice = "金額を入力してください。"
+            selectedImage = UIImage(systemName: "photo")!
         }
         self.shop = shop
         self.goods = goods
@@ -94,7 +100,7 @@ struct GoodsSheetView: View {
                         Text("グッズ名")
                             .font(.headline)
                             .frame(width: 80)
-                        TextField("グッズを入力してください。", text: $goodsName)
+                        TextField("", text: $goodsName)
                             .textFieldStyle(.roundedBorder)
                             .multilineTextAlignment(.trailing)
                         Text("")
@@ -126,10 +132,18 @@ struct GoodsSheetView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { //入力したデータを前のViewへ渡して保存を行う。
-                        let goodPrice = Int(goodsPrice) ?? 0
-                        let goodsItem = SaveGood(name: goodsName, price: goodPrice, image: selectedImage)
-                        saveGoods(goodsItem)
-                        dismiss()
+                        do {
+                            let goods = try checkInputGoods(goodsName: goodsName,
+                                                            goodsPrice: goodsPrice,
+                                                            uiImage: selectedImage)
+                            saveGoods(goods)
+                            dismiss()
+                        } catch let error as GoodsError {
+                            errorText = error.localizedDescription
+                            isError = true
+                        } catch {
+                            print("#unknown error.")
+                        }
                     } label: {
                         Text("保存")
                     }
@@ -139,6 +153,24 @@ struct GoodsSheetView: View {
             .sheet(isPresented: $isPickerPresented) {
                 PhotoPicker(selectedImage: $selectedImage)
             }
+            .alert(errorText, isPresented: $isError) {
+                Button("OK"){
+                    isError = false
+                }
+            }
         }
     }
+    
+    private func checkInputGoods(goodsName: String, goodsPrice: String, uiImage: UIImage?) throws -> SaveGood {
+        //グッズの名前をチェック。
+        guard !goodsName.isEmpty else { throw GoodsError.emptyGoodsName }
+        //グッズの金額をチェック。
+        guard let goodsPrice = Int(goodsPrice) else { throw GoodsError.invalidPrice }
+        //画像チェックし、nilの場合は『photo』の画像を含んだSaveGood型を返す。
+        guard let uiImage = uiImage else {
+            return SaveGood(name: goodsName, price: goodsPrice, uiImage: UIImage(systemName: "photo")!)
+        }
+        return SaveGood(name: goodsName, price: goodsPrice, uiImage: uiImage)
+    }
+    
 }

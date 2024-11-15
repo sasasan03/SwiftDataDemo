@@ -7,20 +7,6 @@
 
 import Foundation
 
-enum ShopError: LocalizedError {
-    case saveDataError
-    case matchingGoodError
-    
-    var errorDescription: String? {
-        switch self {
-        case .saveDataError:
-            return "データの保存に失敗しました。"
-        case .matchingGoodError:
-            return "書き換えるグッズが見つけられませんでした。"
-        }
-    }
-}
-
 enum ImageFileManagerError: LocalizedError {
     case documentURLNotFound
     case invalidFilePath
@@ -47,3 +33,36 @@ enum ImageFileManagerError: LocalizedError {
     }
 }
 
+enum ShopError: LocalizedError {
+    case emptyShopName
+    case saveDataError
+    case matchingGoodError
+    
+    var errorDescription: String? {
+        switch self {
+        case .saveDataError:
+            return "データの保存に失敗しました。"
+        case .matchingGoodError:
+            return "書き換えるグッズが見つけられませんでした。"
+        case .emptyShopName:
+            return "ショップネームを入力してください。"
+        }
+    }
+}
+
+enum GoodsError: LocalizedError {
+    case emptyGoodsName
+    case emptyGoodsPrice
+    case invalidPrice
+    
+    var errorDescription: String? {
+        switch self {
+        case .emptyGoodsName:
+            return "商品の名前を入力してください。"
+        case .emptyGoodsPrice:
+            return "商品の金額を入力してください。"
+        case .invalidPrice:
+            return "無効な金額です、"
+        }
+    }
+}
