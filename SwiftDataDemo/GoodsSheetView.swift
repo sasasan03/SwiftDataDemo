@@ -48,76 +48,47 @@ struct GoodsSheetView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if let goods { //グッズ編集画面(すでに画像、名前、金額を持っている)
-                    if let selectedImage {
-                        Image(uiImage:  selectedImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 200, height: 200)
-                            .onTapGesture {
-                                isPickerPresented = true
-                            }
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.blue)
-                            .frame(width: 200, height: 200)
-                            .onTapGesture {
-                                isPickerPresented = true
-                            }
-                    }
-                    TextField(goods.name, text: $goodsName)
+                if let selectedImage {
+                    Image(uiImage: selectedImage)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.blue)
+                        .frame(width: 250, height: 250)
+                        .onTapGesture {
+                            isPickerPresented = true
+                        }
+                } else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(.blue)
+                        .frame(width: 250, height: 250)
+                        .onTapGesture {
+                            isPickerPresented = true
+                        }
+                }
+                
+                HStack {
+                    Text("グッズ名")
+                        .font(.headline)
+                        .frame(width: 80)
+                    TextField(goodsName, text: $goodsName)
                         .textFieldStyle(.roundedBorder)
-                        .frame(width: 250)
-                        .padding()
-                    TextField(String(goods.price), text: $goodsPrice)
+                        .multilineTextAlignment(.trailing)
+                    Text("")
+                        .frame(width: 30)
+                }
+                HStack {
+                    Text("金額")
+                        .font(.headline)
+                        .frame(width: 80)
+                    TextField(goodsPrice, text: $goodsPrice)
                         .textFieldStyle(.roundedBorder)
-                        .frame(width: 250)
-                        .padding()
-                } else { //グッズ追加画面
-                    if let selectedImage {
-                        Image(uiImage: selectedImage)
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.blue)
-                            .frame(width: 250, height: 250)
-                            .onTapGesture {
-                                isPickerPresented = true
-                            }
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.blue)
-                            .frame(width: 250, height: 250)
-                            .onTapGesture {
-                                isPickerPresented = true
-                            }
-                    }
-                    
-                    HStack {
-                        Text("グッズ名")
-                            .font(.headline)
-                            .frame(width: 80)
-                        TextField("", text: $goodsName)
-                            .textFieldStyle(.roundedBorder)
-                            .multilineTextAlignment(.trailing)
-                        Text("")
-                            .frame(width: 30)
-                    }
-                    HStack {
-                        Text("金額")
-                            .font(.headline)
-                            .frame(width: 80)
-                        TextField("金額を入力してください。", text: $goodsPrice)
-                            .textFieldStyle(.roundedBorder)
-                            .keyboardType(.numberPad)
-                            .multilineTextAlignment(.trailing)
-                        Text("円")
-                            .font(.subheadline)
-                            .frame(width: 30, alignment: .leading)
-                    }
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                    Text("円")
+                        .font(.subheadline)
+                        .frame(width: 30, alignment: .leading)
                 }
                 
             }
