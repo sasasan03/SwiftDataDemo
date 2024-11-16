@@ -8,6 +8,8 @@
 import Foundation
 import SwiftUI
 
+
+//TODO: パスが重複してしまうと、書き込み取り出しができなくなるのでバリデーション処理を追加する
 struct ImageFileManager {
     
     let fileManager = FileManager.default

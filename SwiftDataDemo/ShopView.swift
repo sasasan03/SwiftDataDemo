@@ -11,8 +11,8 @@ struct ShopView: View {
     
     @Environment(\.modelContext) var context
     @Query private var savedShopList:[Shop] = []//get_onlyのプロパティ
-    @State private var path: [Shop] = []
     @State private var shopList:[Shop] = []// 表示と編集のためのプロパティ。コンピューテッドプロパティにする。
+    @State private var path: [Shop] = []
     @State private var showAddShopView = false
     @State private var isError = false
     let imageFileManager = ImageFileManager()

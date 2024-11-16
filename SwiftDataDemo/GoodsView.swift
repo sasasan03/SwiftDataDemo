@@ -61,7 +61,7 @@ struct GoodsView: View {
         }
         .navigationTitle("『\(shop.name)』編集画面")
         .alert(isPresented: $isError, error: ShopError.matchingGoodError) {
-            Button("OK"){
+            Button("了解"){
                 isError = false
             }
         }

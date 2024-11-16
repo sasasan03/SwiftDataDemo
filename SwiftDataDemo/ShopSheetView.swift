@@ -11,7 +11,7 @@ import SwiftUI
 struct ShopSheetView: View {
     
     @Environment(\.dismiss) private var dismiss
-    @State private var shopName = "" //TODO: パスが重複してしまうと、書き込み取り出しができなくなるのでバリデーション処理を追加する
+    @State private var shopName = ""
     @State private var selectedImage: UIImage?
     @State private var isPickerPresented = false
     @State private var isError = false
@@ -72,14 +72,13 @@ struct ShopSheetView: View {
                         Text("キャンセル")
                             .foregroundStyle(.red)
                     }
-
                 }
             }
             .sheet(isPresented: $isPickerPresented) {
                 PhotoPicker(selectedImage: $selectedImage)
             }
             .alert(isPresented: $isError, error: ShopError.emptyShopName) {
-                Button("OK"){
+                Button("了解"){
                     isError = false
                 }
             }
@@ -102,10 +101,11 @@ struct ShopSheetView: View {
         }
     }
     
+    /// 入力情報を破棄するかどうかの確認を行う。
     private func confirmDelete(shopName: String){
-        if !shopName.isEmpty { //空でなければアラートを表示させる
+        if !shopName.isEmpty { //ショップの名前が入力されていなければアラートを表示させる
             shouldConfirmDeletion = true
-        } else { //shopNameが空であれば閉じる
+        } else { //ショップの名前が入力されていた場合は閉じる
             dismiss()
         }
     }
