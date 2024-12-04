@@ -130,7 +130,6 @@ struct GoodsSheetView: View {
                             .frame(width: 30, alignment: .leading)
                     }
                 }
-                
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

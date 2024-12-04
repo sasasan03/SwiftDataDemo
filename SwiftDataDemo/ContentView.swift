@@ -14,11 +14,11 @@ struct ContentView: View {
         //🟥簡単なリストデータ
 //        SimpleData()
         
-        //🟥AEONのView
-        ShopView()
+        //🟥買い物アプリ
+//        ShopView()
         
-        //🟥ファイルパスのデモ
-//        FilePathDemo()
+        //🟥ジェスチャー
+        ShoppingView()
     }
 }
 
