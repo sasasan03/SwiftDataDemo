@@ -18,7 +18,8 @@ struct ContentView: View {
 //        ShopView()
         
         //🟥ジェスチャー
-        ShoppingView()
+//        ShoppingView()
+        NeoShoppingView()
     }
 }
 
